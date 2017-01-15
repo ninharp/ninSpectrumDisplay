@@ -4,7 +4,7 @@ before_install:
   - source <(curl -SLs https://raw.githubusercontent.com/adafruit/travis-ci-arduino/master/install.sh)
 install:
   - which arduino
-  - ln -s $PWD/ninSpectrumDisplay /usr/share/arduino/libraries/ninSpectrumDisplay
+  - ln -s $PWD/ninSpectrumDisplay /home/travis/arduino_ide/libraries/ninSpectrumDisplay
   - arduino --install-library "Adafruit NeoPixel"
 script:
   - build_main_platforms
