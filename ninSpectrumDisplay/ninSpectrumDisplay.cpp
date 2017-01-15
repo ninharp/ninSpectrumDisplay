@@ -22,41 +22,16 @@
 
 ninSpectrumDisplay::ninSpectrumDisplay(uint8_t STROBE, uint8_t RESET, uint8_t VOUT)
 { 
-    // set pins to internal available ones
-    strobePin = STROBE;
-    resetPin = RESET;
-    voutPin = VOUT;
-
-    // init default values
-    currPos = 0;
-    currCharn = 0;
-    currColor = 0x0000AA;
-
-    // Setup Strips
-    analyzer[0].band = Adafruit_NeoPixel(LEDS_BAND, analyzer[0].pin, NEO_GRB + NEO_KHZ800);
-    analyzer[1].band = Adafruit_NeoPixel(LEDS_BAND, analyzer[1].pin, NEO_GRB + NEO_KHZ800);
-    analyzer[2].band = Adafruit_NeoPixel(LEDS_BAND, analyzer[2].pin, NEO_GRB + NEO_KHZ800);
-    analyzer[3].band = Adafruit_NeoPixel(LEDS_BAND, analyzer[3].pin, NEO_GRB + NEO_KHZ800);
-    analyzer[4].band = Adafruit_NeoPixel(LEDS_BAND, analyzer[4].pin, NEO_GRB + NEO_KHZ800);
-    analyzer[5].band = Adafruit_NeoPixel(LEDS_BAND, analyzer[5].pin, NEO_GRB + NEO_KHZ800);
-    analyzer[6].band = Adafruit_NeoPixel(LEDS_BAND, analyzer[6].pin, NEO_GRB + NEO_KHZ800);
-
-    // Set pins
-    pinMode(resetPin, OUTPUT); // reset pin mode
-    pinMode(strobePin, OUTPUT); // strobe pin mode
-
-    // Begin strips and set all leds to off
-    for (uint8_t band = 0; band < MSGEQ7_MAX_BAND; band++) {
-      analyzer[band].band.begin();
-      _AllOff(band);
-    }
-
-    // Clear image buffer
-    for (uint8_t i = 0; i < LEDS_BAND; i++)
-      imageBuffer[i] = 0x00;
+   ninSpectrumDisplay(STROBE, RESET, VOUT, 2, 3, 4, 5, 6, 7, 8); 
 }
 
 ninSpectrumDisplay::ninSpectrumDisplay(uint8_t STROBE, uint8_t RESET, uint8_t VOUT, uint8_t line1Pin, uint8_t line2Pin, uint8_t line3Pin, uint8_t line4Pin, uint8_t line5Pin, uint8_t line6Pin, uint8_t line7Pin) {
+
+  // set pins to internal available ones
+  strobePin = STROBE;
+  resetPin = RESET;
+  voutPin = VOUT;
+
   analyzer[0].pin = line1Pin;
   analyzer[1].pin = line2Pin;
   analyzer[2].pin = line3Pin;
@@ -64,7 +39,34 @@ ninSpectrumDisplay::ninSpectrumDisplay(uint8_t STROBE, uint8_t RESET, uint8_t VO
   analyzer[4].pin = line5Pin;
   analyzer[5].pin = line6Pin;
   analyzer[6].pin = line7Pin;
-  ninSpectrumDisplay(STROBE, RESET, VOUT);
+
+  // init default values
+  currPos = 0;
+  currCharn = 0;
+  currColor = 0x0000AA;
+
+  // Setup Strips
+  analyzer[0].band = Adafruit_NeoPixel(LEDS_BAND, analyzer[0].pin, NEO_GRB + NEO_KHZ800);
+  analyzer[1].band = Adafruit_NeoPixel(LEDS_BAND, analyzer[1].pin, NEO_GRB + NEO_KHZ800);
+  analyzer[2].band = Adafruit_NeoPixel(LEDS_BAND, analyzer[2].pin, NEO_GRB + NEO_KHZ800);
+  analyzer[3].band = Adafruit_NeoPixel(LEDS_BAND, analyzer[3].pin, NEO_GRB + NEO_KHZ800);
+  analyzer[4].band = Adafruit_NeoPixel(LEDS_BAND, analyzer[4].pin, NEO_GRB + NEO_KHZ800);
+  analyzer[5].band = Adafruit_NeoPixel(LEDS_BAND, analyzer[5].pin, NEO_GRB + NEO_KHZ800);
+  analyzer[6].band = Adafruit_NeoPixel(LEDS_BAND, analyzer[6].pin, NEO_GRB + NEO_KHZ800);
+
+  // Set pins
+  pinMode(resetPin, OUTPUT); // reset pin mode
+  pinMode(strobePin, OUTPUT); // strobe pin mode
+
+  // Begin strips and set all leds to off
+  for (uint8_t band = 0; band < MSGEQ7_MAX_BAND; band++) {
+    analyzer[band].band.begin();
+    _AllOff(band);
+  }
+
+  // Clear image buffer
+  for (uint8_t i = 0; i < LEDS_BAND; i++)
+    displayBuffer[i] = 0x00;
 }
 
 void ninSpectrumDisplay::setFont(uint8_t* font)
@@ -94,11 +96,11 @@ void ninSpectrumDisplay::printChar(uint8_t x, uint8_t y, char ch)
                };
 
   for (uint8_t i = 0; i < LEDS_BAND; i++) {
-    uint16_t temp = charBuffer[i] + (imageBuffer[i] << 8);
+    uint16_t temp = charBuffer[i] + (displayBuffer[i] << 8);
     temp <<= MSGEQ7_MAX_BAND+1; //currPos;
-    imageBuffer[i] = temp >> 8;
-    imageBuffer[i] &=~ (1<<0);
-    //imageBuffer[i] = charBuffer[i];
+    displayBuffer[i] = temp >> 8;
+    displayBuffer[i] &=~ (1<<0);
+    //displayBuffer[i] = charBuffer[i];
   }
   uint8_t charBuffer[LEDS_BAND];
   for (uint8_t i = 0; i < LEDS_BAND; i++) {
@@ -107,17 +109,17 @@ void ninSpectrumDisplay::printChar(uint8_t x, uint8_t y, char ch)
   */
 
   for (uint8_t i = 0; i < LEDS_BAND; i++) {
-    uint16_t temp = pgm_read_byte(&currFont.font[i+4+currFont.y_size]) + (imageBuffer[LEDS_BAND-1-i] << 8);
+    uint16_t temp = pgm_read_byte(&currFont.font[i+4+currFont.y_size]) + (displayBuffer[LEDS_BAND-1-i] << 8);
     temp <<= currFont.x_size+3-x; //MSGEQ7_MAX_BAND; //currPos;
-    imageBuffer[LEDS_BAND-1-i] = temp >> 7;
-    //imageBuffer[LEDS_BAND-1-i] >>= 2;
-    //imageBuffer[LEDS_BAND-1-i] = charBuffer[i];
+    displayBuffer[LEDS_BAND-1-i] = temp >> 7;
+    //displayBuffer[LEDS_BAND-1-i] >>= 2;
+    //displayBuffer[LEDS_BAND-1-i] = charBuffer[i];
   }
 
   uint8_t mask = 0b10000000;
   for (uint8_t band = 0; band < currFont.x_size; band++) {
     for (uint8_t led = LEDS_BAND-currFont.y_size; led < LEDS_BAND; led++) {
-      if (imageBuffer[led] & mask) {
+      if (displayBuffer[led] & mask) {
         analyzer[band].band.setPixelColor(led-3+y, currColor);
       } else {
         analyzer[band].band.setPixelColor(led-3+y, 0x000000);
@@ -129,7 +131,7 @@ void ninSpectrumDisplay::printChar(uint8_t x, uint8_t y, char ch)
     analyzer[band].band.show();
   }
 
-  for (uint8_t i = 0; i < LEDS_BAND; i++) imageBuffer[i] = 0x00;
+  for (uint8_t i = 0; i < LEDS_BAND; i++) displayBuffer[i] = 0x00;
 
 }
 

@@ -68,7 +68,7 @@ class ninSpectrumDisplay {
     uint32_t currColor;
     FONT_t currFont;
 
-    uint8_t imageBuffer[LEDS_BAND];
+    uint8_t displayBuffer[LEDS_BAND];
 
     void _readMSGEQ7(void);
     void _AllOff(uint8_t band);
