@@ -1,6 +1,10 @@
 # ninSpectrumDisplay Arduino Library
 
+[![Travis branch](https://img.shields.io/travis/ninharp/ninSpectrumDisplay/master.svg)]()
+
 This is the Arduino Library for the *ninSpectrumDisplay* which you can find on my blog (link) to build it by yourself.
+
+[![ninSpectrumDisplay Image](https://ninharp.github.io/ninSpectrumDisplay/nsd.png)](https://github.com/ninharp/ninSpectrumDisplay)
 
 The Display consists of an Arduino Nano, an MSGEQ7 IC for the frequency splitting and 7 WS2812 Strips a 10 LEDs to visualize
 the input sound levels. Additionally you can use the display to show text or small images, a sample font file you can find
