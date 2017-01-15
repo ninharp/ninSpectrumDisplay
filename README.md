@@ -28,3 +28,12 @@ folder in your Arduino environment.
 .
 .
 .
+
+## Documentation
+
+The library uses doxygen to generate automagically an API documentation of all functions
+of the library, the doxygen definition was found in *doxyfile*
+
+## License
+
+...
