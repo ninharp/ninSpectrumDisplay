@@ -1,6 +1,7 @@
 # ninSpectrumDisplay Arduino Library
 
-[![Travis branch](https://img.shields.io/travis/ninharp/ninSpectrumDisplay/master.svg)]()
+[![Travis branch](https://img.shields.io/travis/ninharp/ninSpectrumDisplay/master.svg)](https://travis-ci.org/ninharp/ninSpectrumDisplay)
+[!License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)](http://creativecommons.org/licenses/by-nc/4.0/)
 
 This is the Arduino Library for the *ninSpectrumDisplay* which you can find on my blog (link) to build it by yourself.
 
