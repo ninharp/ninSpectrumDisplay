@@ -11,8 +11,8 @@ install:
   - ln -s $PWD/ninSpectrumDisplay /usr/local/share/arduino/libraries/ninSpectrumDisplay
   - arduino --install-library "Adafruit NeoPixel"
 script:
-  - travis_wait 2 arduino --verify --board arduino:avr:uno $PWD/ninSpectrumDisplay/examples/simple_spectrum_analyzer/simple_spectrum_analyzer.ino
-  - travis_wait 2 arduino --verify --board arduino:avr:uno $PWD/ninSpectrumDisplay/examples/simple_text_scroller/simple_text_scroller.ino
+  - travis_wait 2 arduino --verify --board ${BOARD} $PWD/ninSpectrumDisplay/examples/simple_spectrum_analyzer/simple_spectrum_analyzer.ino
+  - travis_wait 2 arduino --verify --board ${BOARD} $PWD/ninSpectrumDisplay/examples/simple_text_scroller/simple_text_scroller.ino
 
 notifications:
   email:
