@@ -19,6 +19,7 @@
 */
 
 #include <ninSpectrumDisplay.h>
+#include "Adafruit_NeoPixel.h"
 
 ninSpectrumDisplay::ninSpectrumDisplay(uint8_t STROBE, uint8_t RESET, uint8_t VOUT)
 { 
