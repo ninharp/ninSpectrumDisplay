@@ -9,7 +9,7 @@ before_install:
   - sudo ln -s /usr/local/share/arduino/arduino /usr/local/bin/arduino
 install:
   - ln -s $PWD /usr/local/share/arduino/libraries/ninSpectrumDisplay
-  - arduino --install-library "Adafruit_NeoPixel"
+  - arduino --install-library "Adafruit NeoPixel"
 script:
   - arduino --verify --board arduino:avr:uno $PWD/examples/simple_spectrum_analyzer/simple_spectrum_analyzer.ino
 notifications:
