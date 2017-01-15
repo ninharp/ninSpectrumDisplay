@@ -49,11 +49,13 @@ struct FONT_t
 typedef struct ANALYZER_t {
   Adafruit_NeoPixel band;
   uint8_t value;
+  uint8_t pin;
 } ANALYZER_t;
 
 class ninSpectrumDisplay {
   public:
-    ninSpectrumDisplay(int STROBE, int RESET, int VOUT);
+    ninSpectrumDisplay(uint8_t STROBE, uint8_t RESET, uint8_t VOUT);
+    ninSpectrumDisplay(uint8_t STROBE, uint8_t RESET, uint8_t VOUT, uint8_t line1Pin, uint8_t line2Pin, uint8_t line3Pin, uint8_t line4Pin, uint8_t line5Pin, uint8_t line6Pin, uint8_t line7Pin);
     void showSpectrum(void);
     void printChar(uint8_t x, uint8_t y, char ch);
     void setFont(uint8_t* font);

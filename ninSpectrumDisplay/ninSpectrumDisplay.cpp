@@ -18,35 +18,30 @@
   examples and tools supplied with the library.
 */
 
-// TODO: Fix issue with x=4 printChar
-// TODO: Move pins for led lines to constructor
-// TODO: define alternate constructors
-// TODO: fulfill the default font
-// TODO: test other display sizes (calculations for fonts especially)
-// TODO: github repository 
-// TODO: README.md (images and so on blah blah)
-
 #include <ninSpectrumDisplay.h>
 
-ninSpectrumDisplay::ninSpectrumDisplay(int STROBE, int RESET, int VOUT)
+ninSpectrumDisplay::ninSpectrumDisplay(uint8_t STROBE, uint8_t RESET, uint8_t VOUT)
 { 
+    // set pins to internal available ones
     strobePin = STROBE;
     resetPin = RESET;
     voutPin = VOUT;
 
+    // init default values
     currPos = 0;
     currCharn = 0;
     currColor = 0x0000AA;
 
     // Setup Strips
-    analyzer[0].band = Adafruit_NeoPixel(LEDS_BAND, 2, NEO_GRB + NEO_KHZ800);
-    analyzer[1].band = Adafruit_NeoPixel(LEDS_BAND, 3, NEO_GRB + NEO_KHZ800);
-    analyzer[2].band = Adafruit_NeoPixel(LEDS_BAND, 4, NEO_GRB + NEO_KHZ800);
-    analyzer[3].band = Adafruit_NeoPixel(LEDS_BAND, 5, NEO_GRB + NEO_KHZ800);
-    analyzer[4].band = Adafruit_NeoPixel(LEDS_BAND, 6, NEO_GRB + NEO_KHZ800);
-    analyzer[5].band = Adafruit_NeoPixel(LEDS_BAND, 7, NEO_GRB + NEO_KHZ800);
-    analyzer[6].band = Adafruit_NeoPixel(LEDS_BAND, 8, NEO_GRB + NEO_KHZ800);
+    analyzer[0].band = Adafruit_NeoPixel(LEDS_BAND, analyzer[0].pin, NEO_GRB + NEO_KHZ800);
+    analyzer[1].band = Adafruit_NeoPixel(LEDS_BAND, analyzer[1].pin, NEO_GRB + NEO_KHZ800);
+    analyzer[2].band = Adafruit_NeoPixel(LEDS_BAND, analyzer[2].pin, NEO_GRB + NEO_KHZ800);
+    analyzer[3].band = Adafruit_NeoPixel(LEDS_BAND, analyzer[3].pin, NEO_GRB + NEO_KHZ800);
+    analyzer[4].band = Adafruit_NeoPixel(LEDS_BAND, analyzer[4].pin, NEO_GRB + NEO_KHZ800);
+    analyzer[5].band = Adafruit_NeoPixel(LEDS_BAND, analyzer[5].pin, NEO_GRB + NEO_KHZ800);
+    analyzer[6].band = Adafruit_NeoPixel(LEDS_BAND, analyzer[6].pin, NEO_GRB + NEO_KHZ800);
 
+    // Set pins
     pinMode(resetPin, OUTPUT); // reset pin mode
     pinMode(strobePin, OUTPUT); // strobe pin mode
 
@@ -59,6 +54,17 @@ ninSpectrumDisplay::ninSpectrumDisplay(int STROBE, int RESET, int VOUT)
     // Clear image buffer
     for (uint8_t i = 0; i < LEDS_BAND; i++)
       imageBuffer[i] = 0x00;
+}
+
+ninSpectrumDisplay::ninSpectrumDisplay(uint8_t STROBE, uint8_t RESET, uint8_t VOUT, uint8_t line1Pin, uint8_t line2Pin, uint8_t line3Pin, uint8_t line4Pin, uint8_t line5Pin, uint8_t line6Pin, uint8_t line7Pin) {
+  analyzer[0].pin = line1Pin;
+  analyzer[1].pin = line2Pin;
+  analyzer[2].pin = line3Pin;
+  analyzer[3].pin = line4Pin;
+  analyzer[4].pin = line5Pin;
+  analyzer[5].pin = line6Pin;
+  analyzer[6].pin = line7Pin;
+  ninSpectrumDisplay(STROBE, RESET, VOUT);
 }
 
 void ninSpectrumDisplay::setFont(uint8_t* font)
