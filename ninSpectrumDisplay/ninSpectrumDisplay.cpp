@@ -81,6 +81,62 @@ void ninSpectrumDisplay::printString(uint8_t x, uint8_t y, uint16_t d, char s[])
   
 }
 
+void ninSpectrumDisplay::scrollString(uint8_t x, uint8_t y, uint16_t d, char s[])
+{
+  for (uint8_t idx = 0; idx < strlen(s); idx++) {
+    char ch = s[idx] - currFont.offset;
+    for (uint8_t i = 0; i < 6; i++) {
+      scrollBuffer[i] = pgm_read_byte(&currFont.font[(ch*currFont.x_size)+i+4]);
+    }
+    showBuffer();
+    delay(d);
+    shiftBufferLeft();
+  }
+}
+
+void print_word(uint16_t b) {
+  Serial.print(">");
+  for (uint8_t z = 32768; z > 0; z >>=1) {
+    if (b & z)
+      Serial.print("X");
+    else
+      Serial.print(" ");
+    if (z == 128)
+      Serial.print(" - ");
+  }
+}
+
+void ninSpectrumDisplay::shiftBufferLeft(void)
+{
+  for (uint8_t i = 0; i < MSGEQ7_MAX_BAND-1; i++) {
+    uint16_t t = displayBuffer[i+1];
+    displayBuffer[i] = t;
+    print_word(displayBuffer[i]);
+    Serial.println();
+  }
+
+  displayBuffer[MSGEQ7_MAX_BAND-1] = scrollBuffer[0];
+
+  for (uint8_t i = 0; i < MSGEQ7_MAX_BAND-1; i++) {
+    uint8_t t = scrollBuffer[i+1];
+    scrollBuffer[i] = t;
+  }
+}
+
+void ninSpectrumDisplay::showBuffer(void)
+{
+  for (uint8_t i = 0; i < MSGEQ7_MAX_BAND; i++) {
+    uint8_t pos = 0;
+    for (uint16_t j = 512; j > 0; j >>= 1)
+        if (displayBuffer[i] & j)
+          analyzer[i].band.setPixelColor(pos++, currColor);
+        else
+          analyzer[i].band.setPixelColor(pos++, offColor);
+
+    analyzer[i].band.show();
+  }
+}
+
 void ninSpectrumDisplay::showSpectrum(void)
 {
   _readMSGEQ7();
@@ -160,6 +216,7 @@ void ninSpectrumDisplay::_initDisplay(uint8_t STROBE, uint8_t RESET, uint8_t VOU
   currPos = 0;
   currCharn = 0;
   currColor = 0x0000AA;
+  offColor = 0x000000;
 
   // Setup Strips
   analyzer[0].band = Adafruit_NeoPixel(LEDS_BAND, analyzer[0].pin, NEO_GRB + NEO_KHZ800);
