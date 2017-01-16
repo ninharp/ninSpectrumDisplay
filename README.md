@@ -35,24 +35,22 @@ Download the zip file from the repository or check it out anywhere.
 Then you have to copy the *ninSpectrumDisplay* folder to your *Arduino/libraries* 
 folder in your Arduino environment.
 
-.
-.
-.
+Load any of the example sketches from the *examples/* directory.
 
 ## Documentation
 
 ### Initializing
 
-__ninSpectrumDisplay(MSGEQ7_STROBE_PIN, MSGEQ7_RESET_PIN, MSGEQ7_VOUT_PIN, [L1P, L2P, L3P, L4P, L5P, L6P, L7P])__
+__ninSpectrumDisplay(STROBE, RESET, VOUT, [L1P, L2P, L3P, L4P, L5P, L6P, L7P])__
 
 Initializes the display. If the pins (L1P to L7P) for the WS2812 strips are omitted it uses the default 
 hardcoded pins (digital pin 2 to 8).
 
-*MSGEQ7_STROBE_PIN* is the Strobe pin of the MSGEQ7 IC
+*STROBE* is the Strobe pin of the MSGEQ7 IC
 
-*MSGEQ7_RESET_PIN* is the Reset pin of the MSGEQ7 IC
+*RESET* is the Reset pin of the MSGEQ7 IC
 
-*MSGEQ7_VOUT_PIN* is the DC Out pin of the MSGEQ7 IC (must be an ADC pin)
+*VOUT* is the DC Out pin of the MSGEQ7 IC (must be an ADC pin)
 
 ```
 ninSpectrumDisplay ninDisplay(11, 10, ADC1);
