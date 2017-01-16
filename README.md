@@ -1,7 +1,9 @@
 # ninSpectrumDisplay Arduino Library
 
 [![Travis branch](https://img.shields.io/travis/ninharp/ninSpectrumDisplay/master.svg)](https://travis-ci.org/ninharp/ninSpectrumDisplay)
-[!License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)](http://creativecommons.org/licenses/by-nc/4.0/)
+[![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)](http://creativecommons.org/licenses/by-nc/4.0/)
+[![Github All Releases](https://img.shields.io/github/downloads/ninharp/ninSpectrumDisplay/total.svg)]()
+[![Twitter Follow](https://img.shields.io/twitter/follow/ninharp.svg?style=social&label=Follow)](https://twitter.com/ninharp)
 
 This is the Arduino Library for the *ninSpectrumDisplay* which you can find on my blog (link) to build it by yourself.
 
@@ -22,6 +24,9 @@ Note: If you want to change the size of the Display, you had to change some valu
 
 ## Works on
 * All Arduino boards (Uno, Due, Mini, Micro, Yun...)
+
+## Circuit
+[![ninSpectrumDisplay Breadboard Circuit](https://ninharp.github.io/ninSpectrumDisplay/fritzing.png)](https://github.com/ninharp/ninSpectrumDisplay)
 
 ## Quick Start
 
