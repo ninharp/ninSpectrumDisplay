@@ -1,9 +1,13 @@
 ninSpectrumDisplay	KEYWORD1
 
 showSpectrum	KEYWORD2
+showDisplay	KEYWORD2
 printChar	KEYWORD2
+printString	KEYWORD2
 setFont	KEYWORD2
 setColor	KEYWORD2
+setPixel	KEYWORD2
+clearDisplay	KEYWORD2
 
 LEFT	LITERAL1
 RIGHT	LITERAL1

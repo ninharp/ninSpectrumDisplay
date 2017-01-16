@@ -57,9 +57,14 @@ class ninSpectrumDisplay {
     ninSpectrumDisplay(uint8_t STROBE, uint8_t RESET, uint8_t VOUT);
     ninSpectrumDisplay(uint8_t STROBE, uint8_t RESET, uint8_t VOUT, uint8_t line1Pin, uint8_t line2Pin, uint8_t line3Pin, uint8_t line4Pin, uint8_t line5Pin, uint8_t line6Pin, uint8_t line7Pin);
     void showSpectrum(void);
+    void showDisplay(void);
+    void setPixel(uint8_t x, uint8_t y);
+    void setPixel(uint8_t x, uint8_t y, uint32_t color);
     void printChar(uint8_t x, uint8_t y, char ch);
+    void printString(uint8_t x, uint8_t y, uint16_t d, char s[]);
     void setFont(uint8_t* font);
     void setColor(uint32_t color);
+    void clearDisplay(void);
   protected:
     uint8_t strobePin, resetPin, voutPin;
     ANALYZER_t analyzer[MSGEQ7_MAX_BAND];
@@ -70,6 +75,7 @@ class ninSpectrumDisplay {
 
     uint8_t displayBuffer[LEDS_BAND];
 
+    void _initDisplay(uint8_t STROBE, uint8_t RESET, uint8_t VOUT, uint8_t line1Pin, uint8_t line2Pin, uint8_t line3Pin, uint8_t line4Pin, uint8_t line5Pin, uint8_t line6Pin, uint8_t line7Pin);
     void _readMSGEQ7(void);
     void _AllOff(uint8_t band);
     uint32_t _ColorWheel(byte WheelPos);

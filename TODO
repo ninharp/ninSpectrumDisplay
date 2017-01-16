@@ -1,3 +1,2 @@
-* Fix issue with x=4 printChar
-* fulfill the default font
 * test other display sizes (calculations for fonts especially)
+* scrollText function

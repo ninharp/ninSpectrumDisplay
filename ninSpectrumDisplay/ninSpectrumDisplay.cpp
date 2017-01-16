@@ -18,16 +18,131 @@
   examples and tools supplied with the library.
 */
 
-#include <ninSpectrumDisplay.h>
+
+#include "Arduino.h"
+#include "ninSpectrumDisplay.h"
 #include "Adafruit_NeoPixel.h"
 
 ninSpectrumDisplay::ninSpectrumDisplay(uint8_t STROBE, uint8_t RESET, uint8_t VOUT)
 { 
-   ninSpectrumDisplay(STROBE, RESET, VOUT, 2, 3, 4, 5, 6, 7, 8); 
+  _initDisplay(STROBE, RESET, VOUT, 2, 3, 4, 5, 6, 7, 8); 
 }
 
-ninSpectrumDisplay::ninSpectrumDisplay(uint8_t STROBE, uint8_t RESET, uint8_t VOUT, uint8_t line1Pin, uint8_t line2Pin, uint8_t line3Pin, uint8_t line4Pin, uint8_t line5Pin, uint8_t line6Pin, uint8_t line7Pin) {
+ninSpectrumDisplay::ninSpectrumDisplay(uint8_t STROBE, uint8_t RESET, uint8_t VOUT, uint8_t line1Pin, uint8_t line2Pin, uint8_t line3Pin, uint8_t line4Pin, uint8_t line5Pin, uint8_t line6Pin, uint8_t line7Pin)
+{
+  _initDisplay(STROBE, RESET, VOUT, line1Pin, line2Pin, line3Pin, line4Pin, line5Pin, line6Pin, line7Pin); 
+}
 
+void ninSpectrumDisplay::setFont(uint8_t* font)
+{
+  currFont.font = font;
+  currFont.x_size = fontbyte(0);
+  currFont.y_size = fontbyte(1);
+  currFont.offset = fontbyte(2);
+  currFont.numchars = fontbyte(3);
+  //currFont.inverted = 0;
+}
+
+void ninSpectrumDisplay::setPixel(uint8_t x, uint8_t y)
+{
+  analyzer[x-1].band.setPixelColor(y-1, currColor);
+  analyzer[x-1].band.show();
+}
+
+void ninSpectrumDisplay::setPixel(uint8_t x, uint8_t y, uint32_t color)
+{
+  analyzer[x-1].band.setPixelColor(y-1, color);
+  analyzer[x-1].band.show();
+}
+
+void ninSpectrumDisplay::printChar(uint8_t x, uint8_t y, char ch)
+{
+  ch = ch - currFont.offset;
+  for (uint8_t i = 0; i < 6; i++) {
+    byte b = pgm_read_byte(&currFont.font[(ch*currFont.x_size)+i+4]);
+    byte pos = 0;
+    for (uint8_t j = 128; j > 0; j >>= 1) {
+      if (b & j) {
+        analyzer[i+x-1].band.setPixelColor(pos++, currColor);
+      } else {
+        analyzer[i+x-1].band.setPixelColor(pos++, 0x000000);
+      }
+    }
+    analyzer[i+x-1].band.show();
+  }
+}
+
+void ninSpectrumDisplay::printString(uint8_t x, uint8_t y, uint16_t d, char s[])
+{
+  for (uint8_t i = 0; i < strlen(s); i++) {
+    printChar(x, y, s[i]);
+    delay(d);  
+  }
+  
+}
+
+void ninSpectrumDisplay::showSpectrum(void)
+{
+  _readMSGEQ7();
+    
+  for(uint8_t band = 0; band < MSGEQ7_MAX_BAND; band++ ) {
+    _AllOff(band);
+
+    if (analyzer[band].value >=80)  { analyzer[band].band.setPixelColor(9, 0xCC0000); }
+    if (analyzer[band].value >=70)  { analyzer[band].band.setPixelColor(8, 0x990000); }
+    if (analyzer[band].value >=60)  { analyzer[band].band.setPixelColor(7, 0x550000); }
+    if (analyzer[band].value >=50)  { analyzer[band].band.setPixelColor(6, 0x0F0000); }
+    if (analyzer[band].value >=45)  { analyzer[band].band.setPixelColor(5, 0x0A0000); }
+    if (analyzer[band].value >=40)  { analyzer[band].band.setPixelColor(4, 0x0A0000); }
+    if (analyzer[band].value >=35)  { analyzer[band].band.setPixelColor(3, 0x00000A); }
+    if (analyzer[band].value >=30)  { analyzer[band].band.setPixelColor(2, 0x00000A); }
+    if (analyzer[band].value >=25)  { analyzer[band].band.setPixelColor(1, 0x000A00); }
+    if (analyzer[band].value >=20)  { analyzer[band].band.setPixelColor(0, 0x000A00); }
+    
+    analyzer[band].band.show();
+  }
+}
+
+void ninSpectrumDisplay::showDisplay(void) 
+{ 
+  for (uint8_t i = 0; i < MSGEQ7_MAX_BAND; i++) {
+    analyzer[i].band.show();
+  }
+}
+
+void ninSpectrumDisplay::setColor(uint32_t color) { currColor = color; }
+
+void ninSpectrumDisplay::clearDisplay(void)
+{
+  for (uint8_t i = 0; i < MSGEQ7_MAX_BAND; i++) {
+    for (uint8_t j = 0; j < LEDS_BAND; j++) {
+      analyzer[i].band.setPixelColor(j, 0x000000);
+    }
+    analyzer[i].band.show();
+  }
+}
+
+void ninSpectrumDisplay::_readMSGEQ7(void) // Function to read 7 band equalizers
+{
+  digitalWrite(resetPin, HIGH);
+  digitalWrite(resetPin, LOW);
+  for(uint8_t band = 0; band < MSGEQ7_MAX_BAND; band++ ) {
+    digitalWrite(strobePin, LOW); // strobe pin on the shield - kicks the IC up to the next band 
+    delayMicroseconds(30); // 
+    analyzer[band].value = analogRead(voutPin); // store reading
+
+    // Constrain any value above 1023 or below filter Value
+    analyzer[band].value = constrain(analyzer[band].value, DEFAULT_NOISE_FILTER, 1023);
+
+    // Remap the value to a number between 0 and 255
+    analyzer[band].value = map(analyzer[band].value, DEFAULT_NOISE_FILTER, 1023, 0, 255);
+
+    digitalWrite(strobePin, HIGH); 
+  }
+}
+
+void ninSpectrumDisplay::_initDisplay(uint8_t STROBE, uint8_t RESET, uint8_t VOUT, uint8_t line1Pin, uint8_t line2Pin, uint8_t line3Pin, uint8_t line4Pin, uint8_t line5Pin, uint8_t line6Pin, uint8_t line7Pin)
+{
   // set pins to internal available ones
   strobePin = STROBE;
   resetPin = RESET;
@@ -66,126 +181,16 @@ ninSpectrumDisplay::ninSpectrumDisplay(uint8_t STROBE, uint8_t RESET, uint8_t VO
   }
 
   // Clear image buffer
-  for (uint8_t i = 0; i < LEDS_BAND; i++)
+  for (uint8_t i = 0; i < MSGEQ7_MAX_BAND; i++) {
     displayBuffer[i] = 0x00;
-}
-
-void ninSpectrumDisplay::setFont(uint8_t* font)
-{
-  currFont.font = font;
-  currFont.x_size = fontbyte(0);
-  currFont.y_size = fontbyte(1);
-  currFont.offset = fontbyte(2);
-  currFont.numchars = fontbyte(3);
-  //currFont.inverted = 0;
-}
-
-void ninSpectrumDisplay::printChar(uint8_t x, uint8_t y, char ch)
-{
-  /*
-  uint8_t charBuffer[LEDS_BAND] = {  
-              0b00000000,
-              0b00111000,
-              0b00111000,
-              0b00100000,
-              0b00111000,
-              0b00111000,
-              0b00100000,
-              0b00111000,
-              0b00111000,
-              0b00000000
-               };
-
-  for (uint8_t i = 0; i < LEDS_BAND; i++) {
-    uint16_t temp = charBuffer[i] + (displayBuffer[i] << 8);
-    temp <<= MSGEQ7_MAX_BAND+1; //currPos;
-    displayBuffer[i] = temp >> 8;
-    displayBuffer[i] &=~ (1<<0);
-    //displayBuffer[i] = charBuffer[i];
-  }
-  uint8_t charBuffer[LEDS_BAND];
-  for (uint8_t i = 0; i < LEDS_BAND; i++) {
-    charBuffer[i] = pgm_read_byte(&currFont.font[i+4]);
-  }
-  */
-
-  for (uint8_t i = 0; i < LEDS_BAND; i++) {
-    uint16_t temp = pgm_read_byte(&currFont.font[i+4+currFont.y_size]) + (displayBuffer[LEDS_BAND-1-i] << 8);
-    temp <<= currFont.x_size+3-x; //MSGEQ7_MAX_BAND; //currPos;
-    displayBuffer[LEDS_BAND-1-i] = temp >> 7;
-    //displayBuffer[LEDS_BAND-1-i] >>= 2;
-    //displayBuffer[LEDS_BAND-1-i] = charBuffer[i];
   }
 
-  uint8_t mask = 0b10000000;
-  for (uint8_t band = 0; band < currFont.x_size; band++) {
-    for (uint8_t led = LEDS_BAND-currFont.y_size; led < LEDS_BAND; led++) {
-      if (displayBuffer[led] & mask) {
-        analyzer[band].band.setPixelColor(led-3+y, currColor);
-      } else {
-        analyzer[band].band.setPixelColor(led-3+y, 0x000000);
-      }
-    }
-    //currColor = 0x0000AA; //_ColorWheel(((band * 256 / 100) + j) & 255);
-
-    mask >>= 1;
-    analyzer[band].band.show();
-  }
-
-  for (uint8_t i = 0; i < LEDS_BAND; i++) displayBuffer[i] = 0x00;
-
-}
-
-void ninSpectrumDisplay::showSpectrum(void)
-{
-  _readMSGEQ7();
-    
-  for(uint8_t band = 0; band < MSGEQ7_MAX_BAND; band++ ) {
-    _AllOff(band);
-
-    if (analyzer[band].value >=80)  { analyzer[band].band.setPixelColor(9, 0xCC0000); }
-    if (analyzer[band].value >=70)  { analyzer[band].band.setPixelColor(8, 0x990000); }
-    if (analyzer[band].value >=60)  { analyzer[band].band.setPixelColor(7, 0x550000); }
-    if (analyzer[band].value >=50)  { analyzer[band].band.setPixelColor(6, 0x0F0000); }
-    if (analyzer[band].value >=45)  { analyzer[band].band.setPixelColor(5, 0x0A0000); }
-    if (analyzer[band].value >=40)  { analyzer[band].band.setPixelColor(4, 0x0A0000); }
-    if (analyzer[band].value >=35)  { analyzer[band].band.setPixelColor(3, 0x00000A); }
-    if (analyzer[band].value >=30)  { analyzer[band].band.setPixelColor(2, 0x00000A); }
-    if (analyzer[band].value >=25)  { analyzer[band].band.setPixelColor(1, 0x000A00); }
-    if (analyzer[band].value >=20)  { analyzer[band].band.setPixelColor(0, 0x000A00); }
-    
-    analyzer[band].band.show();
-  }
-}
-
-void ninSpectrumDisplay::setColor(uint32_t color) { currColor = color; }
-
-void ninSpectrumDisplay::_readMSGEQ7(void) // Function to read 7 band equalizers
-{
-  digitalWrite(resetPin, HIGH);
-  digitalWrite(resetPin, LOW);
-  for(uint8_t band = 0; band < MSGEQ7_MAX_BAND; band++ ) {
-    digitalWrite(strobePin, LOW); // strobe pin on the shield - kicks the IC up to the next band 
-    delayMicroseconds(30); // 
-    analyzer[band].value = analogRead(voutPin); // store reading
-
-    // Constrain any value above 1023 or below filter Value
-    analyzer[band].value = constrain(analyzer[band].value, DEFAULT_NOISE_FILTER, 1023);
-
-    // Remap the value to a number between 0 and 255
-    analyzer[band].value = map(analyzer[band].value, DEFAULT_NOISE_FILTER, 1023, 0, 255);
-
-    digitalWrite(strobePin, HIGH); 
-  }
 }
 
 void ninSpectrumDisplay::_AllOff(uint8_t band)
 {
-  //for (uint8_t i = 0; i < MSGEQ7_MAX_BAND; i++)
-  //{
   for (uint8_t x = 0; x < LEDS_BAND; x++) 
     analyzer[band].band.setPixelColor(x, 0x000000);
-  //}
 }
 
 // Input a value 0 to 255 to get a color value.
