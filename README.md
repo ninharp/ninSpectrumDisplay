@@ -25,6 +25,9 @@ Note: If you want to change the size of the Display, you had to change some valu
 ## Works on
 * All Arduino boards (Uno, Due, Mini, Micro, Yun...)
 
+## Circuit
+[![ninSpectrumDisplay Breadboard Circuit](https://ninharp.github.io/ninSpectrumDisplay/fritzing.png)](https://github.com/ninharp/ninSpectrumDisplay)
+
 ## Quick Start
 
 Download the zip file from the repository or check it out anywhere.
