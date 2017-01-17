@@ -45,19 +45,30 @@ void ninSpectrumDisplay::setFont(uint8_t* font)
 
 void ninSpectrumDisplay::setPixel(uint8_t x, uint8_t y)
 {
-  setPixel(x, y, currColor);
-}
-
-void ninSpectrumDisplay::setPixel(uint8_t x, uint8_t y, uint32_t color)
-{
   uint16_t mask = 1;
   mask <<= y-1;
   displayBuffer[x-1] |= mask;
 }
 
+void ninSpectrumDisplay::setColorPixel(uint8_t x, uint8_t y, uint32_t color)
+{
+  displayBufferColor[x-1][y-1] = color;
+}
+
 void ninSpectrumDisplay::printLine(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1)
 {
-  printLine(x0, y0, x1, y1, currColor);
+  int dx =  abs(x1-x0), sx = x0<x1 ? 1 : -1;
+  int dy = -abs(y1-y0), sy = y0<y1 ? 1 : -1;
+  int err = dx+dy, e2; /* error value e_xy */
+
+  while(1) {
+    setPixel(x0, y0);
+    if (x0==x1 && y0==y1) break;
+    e2 = 2*err;
+    if (e2 > dy) { err += dy; x0 += sx; } /* e_xy+e_x > 0 */
+    if (e2 < dx) { err += dx; y0 += sy; } /* e_xy+e_y < 0 */
+  }
+  showBuffer();
 }
 
 void ninSpectrumDisplay::printLine(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint32_t color)
@@ -67,15 +78,21 @@ void ninSpectrumDisplay::printLine(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y
   int err = dx+dy, e2; /* error value e_xy */
 
   while(1) {
-    setPixel(x0, y0, currColor);
+    setColorPixel(x0, y0, color);
     if (x0==x1 && y0==y1) break;
     e2 = 2*err;
     if (e2 > dy) { err += dy; x0 += sx; } /* e_xy+e_x > 0 */
     if (e2 < dx) { err += dx; y0 += sy; } /* e_xy+e_y < 0 */
   }
+  showBufferColor();
 }
 
 void ninSpectrumDisplay::printChar(uint8_t x, uint8_t y, char ch)
+{
+  ninSpectrumDisplay::printChar(x, y, ch, currColor);
+}
+
+void ninSpectrumDisplay::printChar(uint8_t x, uint8_t y, char ch, uint32_t color)
 {
   ch = ch - currFont.offset;
   for (uint8_t i = 0; i < 6; i++) {
@@ -83,9 +100,9 @@ void ninSpectrumDisplay::printChar(uint8_t x, uint8_t y, char ch)
     byte pos = 0;
     for (uint8_t j = 128; j > 0; j >>= 1) {
       if (b & j) {
-        analyzer[i+x-1].band.setPixelColor(pos++, currColor);
+        analyzer[i+x-1].band.setPixelColor(((pos++)+y), color);
       } else {
-        analyzer[i+x-1].band.setPixelColor(pos++, 0x000000);
+        analyzer[i+x-1].band.setPixelColor(((pos++)+y), 0x000000);
       }
     }
     analyzer[i+x-1].band.show();
@@ -93,6 +110,11 @@ void ninSpectrumDisplay::printChar(uint8_t x, uint8_t y, char ch)
 }
 
 void ninSpectrumDisplay::printString(uint8_t x, uint8_t y, uint16_t d, char s[])
+{
+  printString(x, y, d, s, currColor);
+}
+
+void ninSpectrumDisplay::printString(uint8_t x, uint8_t y, uint16_t d, char s[], uint32_t color)
 {
   for (uint8_t i = 0; i < strlen(s); i++) {
     printChar(x, y, s[i]);
@@ -111,10 +133,10 @@ void ninSpectrumDisplay::scrollString(uint8_t y, uint16_t d, char s[])
    
     for (uint8_t i = 0; i < currFont.x_size; i++) {
       displayBuffer[i] = pgm_read_byte(&currFont.font[(ch*currFont.x_size)+i+4]);
-      displayBuffer[i] <<= 1;
+      displayBuffer[i] <<= y;
       if (ch_next > 0) {
         scrollBuffer[i] = pgm_read_byte(&currFont.font[(ch_next*currFont.x_size)+i+4]);
-        scrollBuffer[i] <<= 1;
+        scrollBuffer[i] <<= y;
       }
     }
     for (uint8_t c = 0; c <= currFont.x_size; c++) {
@@ -143,7 +165,7 @@ void ninSpectrumDisplay::showBufferColor(void)
 {
   for (uint8_t i = 0; i < MSGEQ7_MAX_BAND; i++) {
       for (uint8_t b = 0; b < LEDS_BAND; b++)
-          analyzer[i].band.setPixelColor(b, displayBuffer[i][b]);
+          analyzer[i].band.setPixelColor(b, displayBufferColor[i][b]);
       analyzer[i].band.show();
   }
 }
@@ -182,8 +204,11 @@ void ninSpectrumDisplay::setColor(uint32_t color) { currColor = color; }
 void ninSpectrumDisplay::clearDisplay(void)
 {
   for (uint8_t i = 0; i < MSGEQ7_MAX_BAND; i++) {
+    displayBuffer[i] = 0x00;
     for (uint8_t j = 0; j < LEDS_BAND; j++) {
+      displayBufferColor[i][j] = 0x000000;
       analyzer[i].band.setPixelColor(j, 0x000000);
+
     }
     analyzer[i].band.show();
   }

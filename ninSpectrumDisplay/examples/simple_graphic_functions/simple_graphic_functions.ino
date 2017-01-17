@@ -10,21 +10,29 @@
 ninSpectrumDisplay nin(MSGEQ7_STROBE_PIN, MSGEQ7_RESET_PIN, MSGEQ7_VOUT_PIN);
 
 void setup() {
-	// Clears the display initially
+	// Clears the display initially and also clears the displayBuffer
 	nin.clearDisplay();
 
-	// Sets color to dark blue
+	// Sets color to dark blue, that color is used if color parameter is omitted
 	nin.setColor(0x040000);
 
-	nin.printLine(1,1,7,10);
-	nin.showBuffer();
-	delay(1000);
-
-	nin.printLine(1,10,7,1);
-	nin.showBuffer();
-	delay(2000);
 }
 
 void loop() {
+	nin.clearDisplay();
+	delay(400);
+
+	nin.printLine(1,1,7,10, 0x000004);
+	delay(400);
+
+	nin.printLine(1,10,7,1, 0x000400);
+	delay(400);
+
+	nin.printLine(4,1,4,10, 0x040000);
+	delay(400);
+
+	nin.printLine(1,5,7,5, 0x040404);
+	delay(400);
+
 }
 

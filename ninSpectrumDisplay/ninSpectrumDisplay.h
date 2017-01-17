@@ -66,13 +66,15 @@ class ninSpectrumDisplay {
     void setColor(uint32_t color);
 
     void setPixel(uint8_t x, uint8_t y);
-    void setPixel(uint8_t x, uint8_t y, uint32_t color);
+    void setColorPixel(uint8_t x, uint8_t y, uint32_t color);
     
     void printLine(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1);
     void printLine(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint32_t color);
     
     void printChar(uint8_t x, uint8_t y, char ch);
+    void printChar(uint8_t x, uint8_t y, char ch, uint32_t color);
     void printString(uint8_t x, uint8_t y, uint16_t d, char s[]);
+    void printString(uint8_t x, uint8_t y, uint16_t d, char s[], uint32_t color);
     void scrollString(uint8_t y, uint16_t d, char s[]);
     void setFont(uint8_t* font);
     
@@ -87,7 +89,7 @@ class ninSpectrumDisplay {
 
     uint16_t displayBuffer[MSGEQ7_MAX_BAND];
     uint16_t scrollBuffer[MSGEQ7_MAX_BAND];
-    uint32_t displayColorBuffer[MSGEQ7_MAX_BAND][LEDS_BAND];
+    uint32_t displayBufferColor[MSGEQ7_MAX_BAND][LEDS_BAND];
 
     void _initDisplay(uint8_t STROBE, uint8_t RESET, uint8_t VOUT, uint8_t line1Pin, uint8_t line2Pin, uint8_t line3Pin, uint8_t line4Pin, uint8_t line5Pin, uint8_t line6Pin, uint8_t line7Pin);
     void _readMSGEQ7(void);
