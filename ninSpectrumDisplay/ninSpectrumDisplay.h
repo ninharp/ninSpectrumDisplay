@@ -48,7 +48,7 @@ struct FONT_t
 
 typedef struct ANALYZER_t {
   Adafruit_NeoPixel band;
-  uint8_t value;
+  uint16_t value;
   uint8_t pin;
 } ANALYZER_t;
 
