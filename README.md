@@ -5,7 +5,7 @@
 [![Github All Releases](https://img.shields.io/github/downloads/ninharp/ninSpectrumDisplay/total.svg)]()
 [![Twitter Follow](https://img.shields.io/twitter/follow/ninharp.svg?style=social&label=Follow)](https://twitter.com/ninharp)
 
-This is the Arduino Library for the *ninSpectrumDisplay* which you can find on my blog (link) to build it by yourself.
+This is the Arduino Library for the *ninSpectrumDisplay* which you can find on my blog ([link](https://www.ninharp.ga/2017/01/17/build-your-own-spectrum-analyzer-display-with-arduino-ws2812-and-msgeq7/)) to build it by yourself.
 
 [![ninSpectrumDisplay Image](https://ninharp.github.io/ninSpectrumDisplay/nsd.png)](https://github.com/ninharp/ninSpectrumDisplay)
 
