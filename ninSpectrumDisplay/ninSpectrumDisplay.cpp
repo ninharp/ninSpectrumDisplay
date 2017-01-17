@@ -81,22 +81,9 @@ void ninSpectrumDisplay::printString(uint8_t x, uint8_t y, uint16_t d, char s[])
   
 }
 
-void ninSpectrumDisplay::scrollString(uint8_t x, uint8_t y, uint16_t d, char s[])
-{
-  for (uint8_t idx = 0; idx < strlen(s); idx++) {
-    char ch = s[idx] - currFont.offset;
-    for (uint8_t i = 0; i < 6; i++) {
-      scrollBuffer[i] = pgm_read_byte(&currFont.font[(ch*currFont.x_size)+i+4]);
-    }
-    showBuffer();
-    delay(d);
-    shiftBufferLeft();
-  }
-}
-
 void print_word(uint16_t b) {
   Serial.print(">");
-  for (uint8_t z = 32768; z > 0; z >>=1) {
+  for (uint16_t z = 32768; z > 0; z >>=1) {
     if (b & z)
       Serial.print("X");
     else
@@ -106,13 +93,34 @@ void print_word(uint16_t b) {
   }
 }
 
+void ninSpectrumDisplay::scrollString(uint8_t x, uint8_t y, uint16_t d, char s[])
+{
+  for (uint8_t idx = 0; idx < strlen(s); idx++) {
+    char ch = s[idx] - currFont.offset;
+    char ch_next = 0;
+    if (idx < strlen(s))
+      ch_next = s[idx+1] - currFont.offset; 
+   
+    for (uint8_t i = 0; i < 6; i++) {
+      displayBuffer[i] = pgm_read_byte(&currFont.font[(ch*currFont.x_size)+i+4]);
+      if (ch_next > 0)
+        scrollBuffer[i] = pgm_read_byte(&currFont.font[(ch_next*currFont.x_size)+i+4]);
+    }
+    for (uint8_t c = 0; c <= currFont.x_size; c++) {
+      showBuffer();
+      delay(d);
+      shiftBufferLeft();
+    }
+  }
+}
+
 void ninSpectrumDisplay::shiftBufferLeft(void)
 {
   for (uint8_t i = 0; i < MSGEQ7_MAX_BAND-1; i++) {
     uint16_t t = displayBuffer[i+1];
     displayBuffer[i] = t;
-    print_word(displayBuffer[i]);
-    Serial.println();
+    //print_word(t);
+    //Serial.println();
   }
 
   displayBuffer[MSGEQ7_MAX_BAND-1] = scrollBuffer[0];

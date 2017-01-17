@@ -18,7 +18,7 @@ void setup() {
 	nin.clearDisplay();
 
 	// Sets color to dark blue
-	nin.setColor(0x000004);
+	nin.setColor(0x001000);
 
 	// Sets default font
 	nin.setFont(defFont);
@@ -26,7 +26,7 @@ void setup() {
 
 void loop() {
 	// Prints the scrolling text
-	nin.scrollString(1, 1, 350, "Test");
+	nin.scrollString(1, 1, 150, "Testing the Westing");
 	delay(500);
 }
 
