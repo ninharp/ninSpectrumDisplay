@@ -1,1 +1,3 @@
 * test other display sizes (calculations for fonts especially)
+* change construction from 1/0 processing to color value processing
+  - should be an array of uint32_t displayBuffer[7][10];
