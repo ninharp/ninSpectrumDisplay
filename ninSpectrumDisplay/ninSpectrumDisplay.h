@@ -62,7 +62,7 @@ class ninSpectrumDisplay {
     void setPixel(uint8_t x, uint8_t y, uint32_t color);
     void printChar(uint8_t x, uint8_t y, char ch);
     void printString(uint8_t x, uint8_t y, uint16_t d, char s[]);
-    void scrollString(uint8_t x, uint8_t y, uint16_t d, char s[]);
+    void scrollString(uint8_t y, uint16_t d, char s[]);
     void showBuffer(void);
     void setFont(uint8_t* font);
     void setColor(uint32_t color);

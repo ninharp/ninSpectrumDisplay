@@ -13,12 +13,11 @@ ninSpectrumDisplay nin(MSGEQ7_STROBE_PIN, MSGEQ7_RESET_PIN, MSGEQ7_VOUT_PIN);
 extern uint8_t defFont[];
 
 void setup() {
-	Serial.begin(115200);
 	// Clears the display initially
 	nin.clearDisplay();
 
 	// Sets color to dark blue
-	nin.setColor(0x001000);
+	nin.setColor(0x000005);
 
 	// Sets default font
 	nin.setFont(defFont);
@@ -26,7 +25,7 @@ void setup() {
 
 void loop() {
 	// Prints the scrolling text
-	nin.scrollString(1, 1, 150, "Testing the Westing");
+	nin.scrollString(1, 100, "Hallo Welt");
 	delay(500);
 }
 
