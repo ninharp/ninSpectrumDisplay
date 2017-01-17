@@ -50,8 +50,6 @@ void ninSpectrumDisplay::setPixel(uint8_t x, uint8_t y)
 
 void ninSpectrumDisplay::setPixel(uint8_t x, uint8_t y, uint32_t color)
 {
-  /*analyzer[x-1].band.setPixelColor(y-1, color);
-  analyzer[x-1].band.show();*/
   uint16_t mask = 1;
   mask <<= y-1;
   displayBuffer[x-1] |= mask;

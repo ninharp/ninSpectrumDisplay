@@ -61,6 +61,7 @@ class ninSpectrumDisplay {
     void showDisplay(void);
     void clearDisplay(void);
     void showBuffer(void);
+    void showBufferColor(void);
 
     void setColor(uint32_t color);
 
